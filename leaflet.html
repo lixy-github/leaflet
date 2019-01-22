@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>leaflet</title>
+    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="css/MarkerCluster.css">
+    <link rel="stylesheet" href="css/MarkerCluster.Default.css">
+    <script src="js/leaflet.js"></script>
+    <script src="js/leafletChineseTMSProviders.js"></script>
+    <script src="js/leaflet.markercluster-src.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body,
+        #mapid {
+            width: 100%;
+            height: 100%;
+        }
+        .leaflet-touch .leaflet-control-layers-toggle {
+            width: 33px;
+            height: 33px;
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="mapid"></div>
+    <script>
+        var options = {
+            maxZoom: 18,
+            minZoom: 4
+        }
+        var TianDiTu = LMapTMS("TianDiTu.Normal.Map", options);
+        var GaoDe = LMapTMS("GaoDe.Normal.Map", options);
+        var GaoDeWX = LMapTMS("GaoDe.Satellite.Map", options);
+        var QQ = LMapTMS("QQ.Normal.Map", options);
+        var QQWX = LMapTMS("QQ.Satellite.Map", options);
+        var Google = LMapTMS("Google.Normal.Map", options);
+        var Geoq = LMapTMS("Geoq.Normal.Map", options);
+
+        var normal = L.layerGroup([GaoDe]);
+
+        var baseLayers = {
+            "高德": GaoDe,
+            "腾讯": QQ,   
+            "谷歌": Google,
+            "Geoq": Geoq, 
+            "天地图": TianDiTu,  //  打不开
+            "高德卫星": GaoDeWX,
+            "腾讯卫星": QQWX
+        }
+
+        var map = L.map("mapid", {
+            center: [31.59, 120.29],
+            zoom: 4,
+            layers: [normal],
+            zoomControl: false,
+            attributionControl: false
+        });
+
+        // ======控件=======================================================================================
+        L.control.zoom({
+            zoomInTitle: "放大",
+            zoomOutTitle: "缩小"
+        }).addTo(map);
+        L.control.layers(baseLayers, null, {
+            position: "topleft"
+        }).addTo(map);
+        L.control.scale({
+            maxWidth: 100,
+            metric: true,
+            imperial: false,
+            position: "bottomleft"
+        }).addTo(map);
+        L.marker([31.59, 120.29]).addTo(map);
+
+        // =======点聚合======================================================================================
+        /* var markers = L.markerClusterGroup({
+            showCoverageOnHover: false
+        });
+        var marker = null;
+        map.addEventListener("click", function (e) {
+            marker = L.marker([e.latlng.lat, e.latlng.lng]);
+            marker.bindPopup(`<h5>标题</h5>
+                              <p>${e.latlng}</p>`);
+            markers.addLayer(marker);
+            map.addLayer(markers)
+        }) */
+
+        // ======绘制圆=======================================================================================
+        var i = null; // 圆心
+        var r = 0; // 半径
+        var tempCircle=new L.circle();
+        var circle = null;
+        var circleOption = {
+            weight: 2,
+            color:'#ff0000',
+            fillColor:'#ff0000',
+            fillOpacity:0.2
+        }
+        map.on("mousedown", onmousedown);
+        map.on("mouseup", onmouseup);
+        map.on("mousemove", onmousemove);
+        
+        function onmousedown(e) {
+            i = e.latlng;
+            // console.log(i)
+        }
+
+        function onmousemove(e) {
+            if (i) {
+                map.dragging.disable();
+                r = L.latLng(e.latlng).distanceTo(i)
+                tempCircle.setLatLng(i)
+                tempCircle.setRadius(r)
+                tempCircle.setStyle(circleOption)
+                map.addLayer(tempCircle);
+            }
+        }
+
+        function onmouseup(e) {
+            if (circle) {
+                // map.removeLayer(circle);   //  方法一
+                circle.remove();              //  方法二
+            }
+            r = L.latLng(e.latlng).distanceTo(i);
+            circle = L.circle(i, circleOption);
+            circle.setRadius(r);
+            map.addLayer(circle);
+            i = null;   
+            r = 0;
+            map.dragging.enable();
+            // console.log(circle.getRadius())
+            // console.log(circle.getLatLng())
+        }
+    </script>
+</body>
+
+</html>
