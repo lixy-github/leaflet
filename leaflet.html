@@ -6,18 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>leaflet</title>
+    <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="stylesheet" href="css/leaflet.css">
     <link rel="stylesheet" href="css/MarkerCluster.css">
     <link rel="stylesheet" href="css/MarkerCluster.Default.css">
+    <script src="https://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
     <script src="js/leaflet.js"></script>
     <script src="js/leafletChineseTMSProviders.js"></script>
     <script src="js/leaflet.markercluster-src.js"></script>
+    <script>
+        function backMap() {
+            map.off("mousedown mousemove mouseup click dblclick");
+        }
+    </script>
+    <script src="draw/marker.js"></script>
+    <script src="draw/line.js"></script>
+    <script src="draw/circle.js"></script>
+    <script src="draw/rectangle.js"></script>
+    <script src="draw/polygon.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
         }
-
+        ul, 
+        li {
+            list-style: none;
+        }
+        .clearfix:after {
+            visibility: hidden;
+            content: "";
+            display: block;
+            clear: both;
+            height: 0;
+            font-size: 0;
+        }
+        .clearfix {
+            *zoom: 1;
+        }
         html,
         body,
         #mapid {
@@ -29,11 +55,65 @@
             height: 33px;
             background-size: 20px 20px;
         }
+        .draw-control {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #fff;
+            border: 2px solid rgba(0, 0, 0, .2);
+            border-radius: 5px;
+            z-index: 999;
+        }
+        .draw-control li {
+            float: left;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            border-right: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .draw-control li:hover,
+        .draw-control li.on {
+            background: #f4f4f4;
+        }
+        .draw-control li:last-child {
+            border: 0;
+        }
+        .draw-control li:first-child.on {
+            border-radius: 5px 0 0 5px;
+        }
+        .draw-control li:last-child.on {
+            border-radius: 0 5px 5px 0;
+        }
     </style>
 </head>
 
 <body>
     <div id="mapid"></div>
+    <ul class="draw-control clearfix">
+        <li title="地图" onclick="backMap()" class="on">
+            <i class="fa fa-hand-pointer-o"></i>
+        </li>
+        <li title="绘制点" onclick="drawMarker(map)">
+            <i class="fa fa-map-marker"></i>
+        </li>
+        <li title="绘制线" onclick="drawLine(map)">
+            <i class="fa fa-arrows-h"></i>
+        </li>
+        <li title="绘制圆" onclick="drawCircle(map)">
+            <i class="fa fa-circle-o"></i>
+        </li>
+        <li title="绘制矩形" onclick="drawRect(map)">
+            <i class="fa fa-square-o"></i>
+        </li>
+        <li title="绘制多边形" onclick="makePolygon(map)">
+            <i class="fa fa-connectdevelop"></i>
+        </li>
+        <li title="删除" onclick="removeDraw()">
+            <i class="fa fa-trash-o"></i>
+        </li>
+    </ul>
     <script>
         var options = {
             maxZoom: 18,
@@ -81,7 +161,7 @@
             imperial: false,
             position: "bottomleft"
         }).addTo(map);
-        L.marker([31.59, 120.29]).addTo(map);
+        L.marker([31.59, 120.29]).addTo(map).bindPopup("hello leaflet").openPopup().addTo(map);
 
         // =======点聚合======================================================================================
         /* var markers = L.markerClusterGroup({
@@ -96,52 +176,20 @@
             map.addLayer(markers)
         }) */
 
-        // ======绘制圆=======================================================================================
-        var i = null; // 圆心
-        var r = 0; // 半径
-        var tempCircle=new L.circle();
-        var circle = null;
-        var circleOption = {
-            weight: 2,
-            color:'#ff0000',
-            fillColor:'#ff0000',
-            fillOpacity:0.2
-        }
-        map.on("mousedown", onmousedown);
-        map.on("mouseup", onmouseup);
-        map.on("mousemove", onmousemove);
-        
-        function onmousedown(e) {
-            i = e.latlng;
-            // console.log(i)
+        // 清除所有绘画
+        function removeDraw() {
+            removeMarker();
+            removeCircle();
+            clearPolygon();
+            removeLine();
+            removeRect();
         }
 
-        function onmousemove(e) {
-            if (i) {
-                map.dragging.disable();
-                r = L.latLng(e.latlng).distanceTo(i)
-                tempCircle.setLatLng(i)
-                tempCircle.setRadius(r)
-                tempCircle.setStyle(circleOption)
-                map.addLayer(tempCircle);
-            }
-        }
-
-        function onmouseup(e) {
-            if (circle) {
-                // map.removeLayer(circle);   //  方法一
-                circle.remove();              //  方法二
-            }
-            r = L.latLng(e.latlng).distanceTo(i);
-            circle = L.circle(i, circleOption);
-            circle.setRadius(r);
-            map.addLayer(circle);
-            i = null;   
-            r = 0;
-            map.dragging.enable();
-            // console.log(circle.getRadius())
-            // console.log(circle.getLatLng())
-        }
+        $(function () {
+            $(".draw-control>li").click(function () {
+                $(this).addClass("on").siblings().removeClass("on");
+            })
+        })
     </script>
 </body>
 
