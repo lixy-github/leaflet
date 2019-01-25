@@ -1,4 +1,4 @@
-
+{
     let i = null; // 圆心
     let r = 0; // 半径
     let tempCircle = new L.circle();
@@ -13,17 +13,17 @@
     function drawCircle(map) {
         if (map) {
             backMap();
-            map.on("mousedown", onmousedown);
-            map.on("mousemove", onmousemove);
-            map.on("mouseup", onmouseup);
+            map.on("mousedown", mousedownCircle);
+            map.on("mousemove", mousemoveCircle);
+            map.on("mouseup", mouseupCircle);
         }
     }
 
-    function onmousedown(e) {
+    function mousedownCircle(e) {
         i = L.latLng(e.latlng);
     }
 
-    function onmousemove(e) {
+    function mousemoveCircle(e) {
         if (i) {
             map.dragging.disable();
             r = L.latLng(e.latlng).distanceTo(i)
@@ -34,7 +34,7 @@
         }
     }
 
-    function onmouseup(e) {
+    function mouseupCircle(e) {
         removeCircle();
         if (i) {
             r = L.latLng(e.latlng).distanceTo(i);
@@ -56,3 +56,4 @@
             // circle.remove();              //  方法二
         }
     }
+}

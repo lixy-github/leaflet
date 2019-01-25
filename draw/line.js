@@ -7,26 +7,26 @@
     function drawLine(map) {
         if (map) {
             backMap();
-            map.on('click', onClick);
-            map.on('dblclick', onDoubleClick);
-            map.on('mousemove', onMove);
+            map.on('click', clickPolyline);
+            map.on('dblclick', dblclickPolyline);
+            map.on('mousemove', movePolyline);
         }
     }
 
-    function onClick(e) {
+    function clickPolyline(e) {
         points.push([e.latlng.lat, e.latlng.lng]);
         lines.addLatLng(e.latlng);
         map.addLayer(lines);
     }
 
-    function onMove(e) {
+    function movePolyline(e) {
         if (points.length > 0) {
             tempLines.setLatLngs([points[points.length - 1], [e.latlng.lat, e.latlng.lng]]);
             map.addLayer(tempLines)
         }
     }
 
-    function onDoubleClick(e) {
+    function dblclickPolyline(e) {
         removeLine();
         polyline = L.polyline(points);
         map.addLayer(polyline);

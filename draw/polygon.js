@@ -8,9 +8,9 @@
     function makePolygon(map) {
         if (map) {
             backMap();
-            map.on('click', onClick);    //点击地图
-            map.on('dblclick',onDoubleClick); // 双击地图
-            map.on('mousemove',onMove); 
+            map.on('click', clickPolygon);    //点击地图
+            map.on('dblclick',dblclickPolygon); // 双击地图
+            map.on('mousemove',movePolygon); 
         }
     }
 
@@ -21,21 +21,21 @@
         }
     }
 
-    function onClick(e) {
+    function clickPolygon(e) {
         points.push([e.latlng.lat,e.latlng.lng]);
         lines.addLatLng(e.latlng);
         // map.addLayer(dashLins);
         map.addLayer(lines);
     }
 
-    function onMove(e) {
+    function movePolygon(e) {
         if(points.length>0) {
             dashLins.setLatLngs([points[points.length-1],[e.latlng.lat,e.latlng.lng],points[0]]);
             map.addLayer(dashLins);
         }
     }
 
-    function onDoubleClick(e) {
+    function dblclickPolygon(e) {
         clearPolygon();
         polygon = L.polygon(points);
         map.addLayer(polygon)
