@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>动态路线</title>
+    <link rel="stylesheet" href="../css/leaflet.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <script src="../js/leaflet.js"></script>
+    <script src="../js/leafletChineseTMSProviders.js"></script>
+    <script src="js/leaflet-ant-path.js"></script>
+    <style>
+        #ant-path {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="ant-path"></div>
+
+    <script>
+        var GaoDe =  LMapTMS("GaoDe.Normal.Map", {
+            minZoom: 4,
+            maxZoom: 18
+        });
+       
+        var map = L.map("ant-path", {
+            center: [31.59, 120.29],
+            zoom: 4,
+            layers: GaoDe,
+            zoomControl: false,
+            attributionControl: false
+        });
+        
+        L.control.zoom({
+            zoomInTitle: "放大",
+            zoomOutTiTle: "缩小"
+        }).addTo(map);
+        L.control.scale({
+            maxWidth: 100,
+            imperial: false
+        }).addTo(map);
+
+        var latlngs = [
+            [33.32328495485589, 98.37793350219728],
+            [35.08585193385041, 103.45361709594728],
+            [33.63484521551952, 105.03564834594728],
+            [36.26386077303303, 107.60644912719728],
+            [33.249814006984415, 109.60596084594728],
+            [36.40546479584206, 113.45117568969728],
+            [33.817591681629224, 114.30810928344728],
+            [35.175702581336346, 115.82422256469727],
+            [34.67126448868682, 118.43896865844728],
+            [35.90872633570674, 118.17529678344728],
+            [35.90872633570674, 118.17529678344728]
+        ];
+        
+        var antPolyline = new L.Polyline.AntPath(latlngs, {
+            pause: false,
+            delay: 400,
+            dashArray: [25,30]
+        });
+
+        antPolyline.addTo(map)
+    </script>
+</body>
+</html>
